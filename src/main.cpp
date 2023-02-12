@@ -2,7 +2,7 @@
 
 void setup()
 {
-  //test git
+  //test git 
   // put your setup code here, to run once:
   Serial.begin(9600);
   pinMode(14, INPUT); // fotodioda chodba
