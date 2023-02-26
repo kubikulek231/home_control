@@ -41,6 +41,14 @@ int LightSource::getDurationMax()
 {
     return duration_max;
 }
+int LightSource::getDurationMult()
+{
+    return duration_mult;
+}
+int LightSource::getDurationMultMax()
+{
+    return duration_mult_max;
+}
 
 // setters
 void LightSource::setPinTrig(unsigned char *t)
@@ -84,4 +92,10 @@ void LightSource::setDuration(int d)
 void LightSource::setDurationMax(int dm)
 {
     duration_max = dm;
+}
+void LightSource::setDurationMult(int dmp) {
+    duration_mult = dmp;
+}
+void LightSource::setDurationMultMax(int dmpm) {
+    duration_mult = dmpm;
 }

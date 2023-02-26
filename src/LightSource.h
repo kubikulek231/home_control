@@ -15,6 +15,8 @@ private:
     unsigned char brightness_max = 255;
     int duration = 0;
     int duration_max = 2000;
+    int duration_mult = 0;
+    int duration_mult_max = 40;
 
 public:
 
@@ -38,6 +40,8 @@ public:
     unsigned char getBrightnessMax();
     int getDuration();
     int getDurationMax();
+    int getDurationMult();
+    int getDurationMultMax();
     // setters
     void setPinTrig(unsigned char * t);
     void setPinTrig(unsigned char t);
@@ -48,6 +52,8 @@ public:
     void setBrightnessMax(unsigned char bm);
     void setDuration(int d);
     void setDurationMax(int dm);
+    void setDurationMult(int dmp);
+    void setDurationMultMax(int dmpm);
 };
 
 #endif
