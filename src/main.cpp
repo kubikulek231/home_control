@@ -1,5 +1,5 @@
 #include <Arduino.h>
-
+#include "LightSource.h"
 void setup()
 {
   //test git 2
@@ -137,16 +137,13 @@ ISR(TIMER4_COMPA_vect) // timer compare interrupt service routine
 
 void loop()
 {
-  delay(500);
-   Serial.println(analogRead(14));
-   print_array();
-  // if the light is switched off
-  if (analogRead(14) < 2)
-  {
-    attach_pir(31, 7);
-    attach_pir(30, 0);
-    attach_pir(33, 1);
-    attach_pir(33, 2);
-    attach_pir(33, 2);
-  }
+  LightSource led1;
+  unsigned char test[] = {1, 5};
+  unsigned char test2[] = {9};
+  led1.setPinTrig(1);
+  Serial.println(led1.getPinTrig()[1]);
+  Serial.println(led1.getPinTrig()[0]);
+  led1.setPinTrig(test2);
+  Serial.println(led1.getPinTrig()[0]);
+  delay(10000);
 }
