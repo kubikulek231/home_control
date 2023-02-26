@@ -1,5 +1,6 @@
 #include <Arduino.h>
-
+#include "LightSource.h"
+#include "func.h"
 void setup()
 {
   //test git 2
@@ -80,73 +81,23 @@ void print_array()
   }
 }
 
+LightSource test_led;
+
 // main interrupt code
 ISR(TIMER4_COMPA_vect) // timer compare interrupt service routine
 {
-  // cycles through all the items in the light_state_list
-
-  for (int i = 0; i <= sizeof(light_state_list) / sizeof(light_state_list[0]) - 1; i++)
-  {
-
-    // if rising add +1 brightness
-    if (light_state_list[i][1] == 1)
-    {
-      // if at full brightness change from rising to static
-      if (light_state_list[i][2] == 255)
-      {
-        light_state_list[i][1] = 0;
-      }
-      else
-      {
-        light_state_list[i][2]++;
-      }
-      analogWrite(light_state_list[i][0], light_state_list[i][2]);
-    }
-
-    // if falling add -1 brightness
-    if (light_state_list[i][1] == 2)
-    {
-      // if at lowest brightness change from falling to static
-      if (light_state_list[i][2] == 0)
-      {
-        light_state_list[i][1] = 0;
-        light_state_list[i][4] = 0;
-      }
-      else
-      {
-        light_state_list[i][2]--;
-      }
-      analogWrite(light_state_list[i][0], light_state_list[i][2]);
-    }
-
-    // if at full brightness and static
-    if (light_state_list[i][2] == 255 and light_state_list[i][1] == 0)
-    {
-      if (light_state_list[i][3] == 1500 + light_state_list[i][4] * 20)
-      {
-        light_state_list[i][3] = 0;
-        light_state_list[i][1] = 2;
-      }
-      else
-      {
-        light_state_list[i][3]++;
-      }
-    }
-  }
+  lightUpdate(test_led);
 }
 
 void loop()
 {
-  delay(500);
-   Serial.println(analogRead(14));
-   print_array();
-  // if the light is switched off
-  if (analogRead(14) < 2)
-  {
-    attach_pir(31, 7);
-    attach_pir(30, 0);
-    attach_pir(33, 1);
-    attach_pir(33, 2);
-    attach_pir(33, 2);
-  }
+  LightSource led1;
+  unsigned char test[] = {1, 5};
+  unsigned char test2[] = {9};
+  led1.setPinLed(1);
+  Serial.println(led1.getPinTrig()[1]);
+  Serial.println(led1.getPinTrig()[0]);
+  led1.setPinTrig(test2);
+  Serial.println(led1.getPinTrig()[0]);
+  delay(10000);
 }
