@@ -1,10 +1,11 @@
+
 #include <Arduino.h>
 #include "LightSource.h"
 #include "func.h"
 void setup()
 {
-  //test git 2
-  // put your setup code here, to run once:
+  // test git 2
+  //  put your setup code here, to run once:
   Serial.begin(9600);
   pinMode(14, INPUT); // fotodioda chodba
   pinMode(31, INPUT); // chodba mates
@@ -45,59 +46,20 @@ void setup()
   interrupts(); // enable all interrupts
 }
 
-// array of arrays of bytes with led states
-// (pin_number, state, brightness, duration)
-// state: 0 - static, 1 - rising, 2 - falling
-int light_state_list[8][5] = {{4, 0, 0, 0, 0}, {5, 0, 0, 0, 0}, {6, 0, 0, 0, 0}, {7, 0, 0, 0, 0}, {8, 0, 0, 0, 0}, {9, 0, 0, 0, 0}, {10, 0, 0, 0, 0}, {11, 0, 0, 0, 0}};
-
-// attach light to a given pir sensor
-void attach_pir(int pir_pin, int array_element)
-{
-  if (digitalRead(pir_pin) == 1)
-  {
-    light_state_list[array_element][1] = 1;
-    light_state_list[array_element][3] = 0;
-    if (light_state_list[array_element][4] < 40)
-    {
-      light_state_list[array_element][4]++;
-    }
-  }
-}
-
-// print the array (in case of debugging)
-void print_array()
-{
-  for (int i = 0; i <= sizeof(light_state_list) / sizeof(light_state_list[0]) - 1; i++)
-  {
-    for (int k = 0; k <= 4; k++)
-    {
-      Serial.print(light_state_list[i][k]);
-      Serial.print(",");
-      if (k == 4)
-      {
-        Serial.println(" ");
-      }
-    }
-  }
-}
-
 LightSource test_led;
 
 // main interrupt code
 ISR(TIMER4_COMPA_vect) // timer compare interrupt service routine
 {
-  lightUpdate(test_led);
+  test_led.update();
 }
 
 void loop()
 {
-  LightSource led1;
-  unsigned char test[] = {1, 5};
-  unsigned char test2[] = {9};
-  led1.setPinLed(1);
-  Serial.println(led1.getPinTrig()[1]);
-  Serial.println(led1.getPinTrig()[0]);
-  led1.setPinTrig(test2);
-  Serial.println(led1.getPinTrig()[0]);
-  delay(10000);
+  test_led.setPinLed(4);
+  test_led.setPinTrig(5);
+  while (true)
+  {
+    test_led.sense();
+  }
 }
