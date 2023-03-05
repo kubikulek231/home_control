@@ -22,9 +22,9 @@ void setup()
   digitalWrite(6, LOW);
   pinMode(7, OUTPUT);
   digitalWrite(7, LOW); // led světlo zrcadlo koupelna
-  digitalWrite(8, LOW);
-  pinMode(9, OUTPUT);
-  digitalWrite(9, LOW);
+  digitalWrite(8, LOW); // led svetlo police zluta
+  pinMode(9, OUTPUT); // led svetlo police bila
+  digitalWrite(9, LOW); 
   pinMode(10, OUTPUT);
   digitalWrite(10, LOW);
   pinMode(11, OUTPUT); // led světlo orientační chodba Matěj
@@ -47,21 +47,40 @@ void setup()
   interrupts(); // enable all interrupts
 }
 
-LightSource test_led;
+LightSource chodba;
+LightSource koupelka;
+LightSource koupelka_police_zluta;
+LightSource koupelka_police_bila;
 
 // main interrupt code
 ISR(TIMER4_COMPA_vect) // timer compare interrupt service routine
 {
-  test_led.update();
+  chodba.update();
+  koupelka.update();
+  koupelka_police_bila.update();
+  koupelka_police_zluta.update();
 }
 
 void loop()
 {
-  test_led.setPinLed(4, 11);
-  test_led.setPinTrig(31);
+  chodba.setPinLed(4, 11);
+  chodba.setPinTrig(31);
+  koupelka.setPinLed(5, 6);
+  koupelka.setPinTrig(33);
+  koupelka_police_zluta.setPinLed(8);
+  koupelka_police_zluta.setPinTrig(33);
+  koupelka_police_bila.setPinLed(9);
+  koupelka_police_bila.setBrightnessMax(100);
+  koupelka_police_bila.setPinTrig(33);
+
+
   while (true)
   {
-    delay(500);
-    test_led.sense();
+    delay(50);
+    chodba.sense();
+    koupelka.sense();
+    koupelka_police_bila.sense();
+    koupelka_police_zluta.sense();
+    Serial.println(digitalRead(33));
   }
 }
