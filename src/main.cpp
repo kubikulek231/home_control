@@ -7,6 +7,7 @@ void setup()
   // test git 2
   //  put your setup code here, to run once:
   Serial.begin(9600);
+
   pinMode(14, INPUT); // fotodioda chodba
   pinMode(31, INPUT); // chodba mates
   pinMode(30, INPUT); // chodba wc
@@ -23,8 +24,8 @@ void setup()
   pinMode(7, OUTPUT);
   digitalWrite(7, LOW); // led světlo zrcadlo koupelna
   digitalWrite(8, LOW); // led svetlo police zluta
-  pinMode(9, OUTPUT); // led svetlo police bila
-  digitalWrite(9, LOW); 
+  pinMode(9, OUTPUT);   // led svetlo police bila
+  digitalWrite(9, LOW);
   pinMode(10, OUTPUT);
   digitalWrite(10, LOW);
   pinMode(11, OUTPUT); // led světlo orientační chodba Matěj
@@ -73,7 +74,6 @@ void loop()
   koupelka_police_bila.setBrightnessMax(100);
   koupelka_police_bila.setPinTrig(33);
 
-
   while (true)
   {
     delay(50);
@@ -81,6 +81,19 @@ void loop()
     koupelka.sense();
     koupelka_police_bila.sense();
     koupelka_police_zluta.sense();
-    Serial.println(digitalRead(33));
+    Serial.println(digitalRead(30));
+
+    if (analogRead(15) > 20)
+    {
+      koupelka.enable(0);
+      koupelka_police_bila.enable(0);
+      koupelka_police_zluta.enable(0);
+    }
+    else
+    {
+      koupelka.enable(1);
+      koupelka_police_bila.enable(1);
+      koupelka_police_zluta.enable(1);
+    }
   }
 }

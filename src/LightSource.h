@@ -13,9 +13,9 @@ private:
     unsigned char led_pin_size = 1;
     unsigned char state = 0;
     unsigned char brightness = 0;
-    unsigned char brightness_max = 255;
+    unsigned char brightness_max = 200;
     int duration = 0;
-    int duration_max = 2000;
+    int duration_max = 1000;
     int duration_mult = 0;
     int duration_mult_max = 40;
     bool en = true;
