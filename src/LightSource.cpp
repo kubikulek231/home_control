@@ -68,9 +68,9 @@ void LightSource::sense()
 {
     if (en)
     {
-        for (int i; i < trig_pin_size; i++)
+        for (int i = 0; i < trig_pin_size; i++)
         {
-            if (digitalRead(trig_pin[i]))
+            if (digitalRead(trig_pin[i]) == 1)
             {
                 state = 1;
                 duration = 0;

@@ -30,7 +30,7 @@ void setup()
   pinMode(11, OUTPUT); // led světlo orientační chodba Matěj
   digitalWrite(11, LOW);
   // put your setup code here, to run once:
-  /*
+
   noInterrupts(); // disable all interrupts
                   // set timer4 interrupt at 1Hz
   TCCR4A = 0;     // set entire TCCR1A register to 0
@@ -45,36 +45,23 @@ void setup()
   // enable timer compare interrupt
   TIMSK4 |= (1 << OCIE4A);
   interrupts(); // enable all interrupts
-  */
 }
 
 LightSource test_led;
-LightSource test_led2;
-/*
+
 // main interrupt code
 ISR(TIMER4_COMPA_vect) // timer compare interrupt service routine
 {
   test_led.update();
 }
-*/
 
 void loop()
 {
-  test_led.setPinLed(4, 6, 15, 5, 4, 101, 98, 97);
-  test_led2.setPinLed(4, 6, 15, 5, 4, 99, 98, 97);
-  test_led.setPinTrig(5, 0, 0);
-  test_led2.setPinTrig(69, 99, 123);
-  int i = 0;
+  test_led.setPinLed(4, 11);
+  test_led.setPinTrig(31);
   while (true)
   {
-    i++;
-    delay(50);
-    if (i == 100) {
-      test_led.debug();
-      test_led.sense();
-      test_led2.debug();
-      test_led2.sense();
-      i = 0;
-    }
+    delay(500);
+    test_led.sense();
   }
 }
