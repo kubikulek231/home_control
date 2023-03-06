@@ -17,7 +17,7 @@ private:
     int duration = 0;
     int duration_max = 1000;
     int duration_mult = 0;
-    int duration_mult_max = 40;
+    int duration_mult_max = 500;
     bool en = true;
 
 public:
@@ -32,7 +32,7 @@ public:
      * @param t array of trigger pins
      * @param p array of led pins
      */
-    LightSource(unsigned char *t, unsigned char *p);
+    LightSource(unsigned char t, unsigned char p);
 
     // methods
     void update();

@@ -50,7 +50,6 @@ void setup()
 
 LightSource chodba;
 LightSource koupelka;
-LightSource koupelka_police_zluta;
 LightSource koupelka_police_bila;
 
 // main interrupt code
@@ -59,41 +58,35 @@ ISR(TIMER4_COMPA_vect) // timer compare interrupt service routine
   chodba.update();
   koupelka.update();
   koupelka_police_bila.update();
-  koupelka_police_zluta.update();
 }
 
 void loop()
 {
+  // deklarace promenych
   chodba.setPinLed(4, 11);
   chodba.setPinTrig(31);
-  koupelka.setPinLed(5, 6);
+  koupelka.setPinLed(5, 6, 8);
   koupelka.setPinTrig(33);
-  koupelka_police_zluta.setPinLed(8);
-  koupelka_police_zluta.setPinTrig(33);
   koupelka_police_bila.setPinLed(9);
-  koupelka_police_bila.setBrightnessMax(100);
-  koupelka_police_bila.setPinTrig(33);
+  koupelka_police_bila.setBrightnessMax(50);
 
+  // hlavni smycka
   while (true)
   {
     delay(50);
+
+    // nacti data z pir senzorů
     chodba.sense();
     koupelka.sense();
     koupelka_police_bila.sense();
-    koupelka_police_zluta.sense();
-    Serial.println(digitalRead(30));
 
-    if (analogRead(15) > 20)
-    {
-      koupelka.enable(0);
-      koupelka_police_bila.enable(0);
-      koupelka_police_zluta.enable(0);
-    }
-    else
-    {
-      koupelka.enable(1);
-      koupelka_police_bila.enable(1);
-      koupelka_police_zluta.enable(1);
-    }
+    // jestli je svetlo na fotosenzoru => true
+    bool je_svetlo_koupelka = analogRead(15) > 20;
+    bool je_svetlo_chodba = analogRead(15) > 20;
+
+    // vypni/zapni svetlo
+    koupelka.enable(je_svetlo_koupelka);
+    chodba.enable(je_svetlo_chodba);
+    koupelka_police_bila.enable(je_svetlo_koupelka);
   }
 }

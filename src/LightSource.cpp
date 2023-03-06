@@ -10,6 +10,16 @@ LightSource::LightSource()
     led_pin_size = 1;
 }
 
+LightSource::LightSource(unsigned char t, unsigned char p)
+{
+    trig_pin = new unsigned char[1];
+    led_pin = new unsigned char[1];
+    trig_pin[0] = t;
+    trig_pin[0] = p;
+    trig_pin_size = 1;
+    led_pin_size = 1;
+}
+
 void LightSource::update()
 {
     // if rising add +1 brightness
@@ -52,7 +62,7 @@ void LightSource::update()
     // if at full brightness and static
     if (brightness == brightness_max and state == 0)
     {
-        if (duration == duration_max + duration_mult * 20)
+        if (duration == duration_max + duration_mult * 3)
         {
             duration = 0;
             state = 2;
