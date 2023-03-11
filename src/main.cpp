@@ -1,6 +1,7 @@
 
 #include <Arduino.h>
 #include "LightSource.h"
+#include "TaskScheduler.h"
 #include "func.h"
 void setup()
 {
@@ -13,7 +14,7 @@ void setup()
   pinMode(30, INPUT); // chodba wc
   pinMode(22, INPUT); // kuchyn
   pinMode(32, INPUT); // obývák
-  pinMode(33, INPUT); // koupelna
+  pinMode(42, INPUT); // koupelna
                       //  put your setup code here, to run once:
   pinMode(4, OUTPUT); // led světlo chodba orientační WC
   digitalWrite(4, LOW);
@@ -23,6 +24,7 @@ void setup()
   digitalWrite(6, LOW);
   pinMode(7, OUTPUT);
   digitalWrite(7, LOW); // led světlo zrcadlo koupelna
+  pinMode(8, OUTPUT);
   digitalWrite(8, LOW); // led svetlo police zluta
   pinMode(9, OUTPUT);   // led svetlo police bila
   digitalWrite(9, LOW);
@@ -51,6 +53,9 @@ void setup()
 LightSource chodba;
 LightSource koupelka;
 LightSource koupelka_police_bila;
+LightSource koupelka_police_zluta;
+
+TaskScheduler zachod_odsavani;
 
 // main interrupt code
 ISR(TIMER4_COMPA_vect) // timer compare interrupt service routine
@@ -65,10 +70,10 @@ void loop()
   // deklarace promenych
   chodba.setPinLed(4, 11);
   chodba.setPinTrig(31);
-  koupelka.setPinLed(5, 6, 8);
-  koupelka.setPinTrig(33);
+  koupelka.setPinLed(5, 12, 8);  // zahrnuje i polici - zluta
+  koupelka.setPinTrig(42);
   koupelka_police_bila.setPinLed(9);
-  koupelka_police_bila.setBrightnessMax(50);
+  koupelka_police_bila.setBrightnessMax(100);
 
   // hlavni smycka
   while (true)
@@ -88,5 +93,18 @@ void loop()
     koupelka.enable(je_svetlo_koupelka);
     chodba.enable(je_svetlo_chodba);
     koupelka_police_bila.enable(je_svetlo_koupelka);
+
+
+    // TODO: implementace knihovny a senzoru vzdalenosti
+    // if (zachod_odsavani.trigger(analogRead(cidlo)))
+    /*
+    if (zachod_odsavani.trigger(analogRead(99))) {
+      digitalWrite(100, 1);
+    }
+    else {
+      digitalWrite(100, 0);
+    }
+    
+    */
   }
 }

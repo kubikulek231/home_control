@@ -23,8 +23,9 @@ public:
     TaskScheduler();
 
     // methods
-    void trigger(bool s);
+    bool trigger(bool s);
     void debug();
+    void enable(bool e);
 
     // getters
     int getTreshold();
@@ -39,7 +40,7 @@ public:
     void setTresHoldMax(int tm);
     void setDurationMax(int dm);
     void setDurationMultMax(int dmm);
-    void setEnable(bool en);
+
 };
 
 #endif

@@ -34,7 +34,7 @@ public:
      */
     LightSource(unsigned char t, unsigned char p);
 
-    // methods
+
     void update();
     void sense();
     void enable(bool e);

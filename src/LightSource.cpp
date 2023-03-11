@@ -196,14 +196,21 @@ bool LightSource::getEnable()
 
 void LightSource::setBrightnessMax(unsigned char bm)
 {
-    brightness_max = bm;
+    if (bm >= 0) {
+        brightness_max = bm;
+    }
+    
 }
 void LightSource::setDurationMax(int dm)
 {
+    if (dm >= 0) {
     duration_max = dm;
+    }
 }
 
 void LightSource::setDurationMultMax(int dmpm)
 {
+    if (dmpm >= 0) {
     duration_mult = dmpm;
+    }
 }

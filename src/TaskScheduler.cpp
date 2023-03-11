@@ -1,76 +1,119 @@
 #include "TaskScheduler.h"
 
-class TaskScheduler
+bool TaskScheduler::trigger(bool is_triggered)
 {
-private:
-    int threshold = 0;
-    int threshold_max = 0;
-    int duration = 0;
-    int duration_max = 1000;
-    int duration_mult = 0;
-    int duration_mult_max = 40;
-    bool en = true;
-
-public:
-    // constructors
-    /**
-     * default constructor
-     */
-    TaskScheduler();
-
-    // methods
-    bool trigger(bool s)
+    if (!en)
     {
-        // if disabled
-        if (!en)
+        threshold = 0;
+        duration = 0;
+        duration_mult = 0;
+        return false;
+    }
+
+    if (is_triggered)
+    {
+        if (threshold != threshold_max)
         {
+            threshold++;
             return false;
         }
-        // if triggered
-        if (s)
+        duration_mult++;
+        duration = 0;
+        return true;
+    }
+    else
+    {
+        if ((duration != duration_max + duration_mult * 3) and (threshold == threshold_max))
         {
-            if (threshold != threshold_max)
-            {
-                threshold++;
-                return false;
-            }
-            if (duration != duration_max)
-            {
-                duration++;
-                return false;
-            }
-            else
-            {
-                threshold = 0;
-                duration = 0;
-                return true;
-            }
+            duration++;
+            return true;
         }
         else
         {
-            if (threshold != threshold_max)
-            {
-                threshold--;
-                return false;
-            }
+            threshold = 0;
+            duration = 0;
+            duration_mult = 0;
+            return false;
         }
     }
-    void debug()
+}
+
+void TaskScheduler::debug()
+{
+    Serial.println("----------- debug start -----------");
+    Serial.print("threshold: ");
+    Serial.println(threshold);
+    Serial.print("threshold_max: ");
+    Serial.println(threshold_max);
+    Serial.print("duration: ");
+    Serial.println(duration);
+    Serial.print("duration_max: ");
+    Serial.println(duration_max);
+    Serial.print("duration_mult: ");
+    Serial.println(duration_mult);
+    Serial.print("duration_mult_max: ");
+    Serial.println(duration_mult_max);
+    Serial.print("en: ");
+    Serial.println(en);
+    Serial.println("------------ debug end ------------");
+}
+
+void TaskScheduler::enable(bool e)
+{
+    en = e;
+}
+
+// getters
+int TaskScheduler::getTreshold()
+{
+    return threshold;
+}
+int TaskScheduler::getTresholdMax()
+{
+    return threshold_max;
+}
+int TaskScheduler::getDuraion()
+{
+    return duration;
+}
+int TaskScheduler::getDurationMax()
+{
+    return duration_max;
+}
+int TaskScheduler::getDuraionMult()
+{
+    return duration_mult;
+}
+int TaskScheduler::getDuraionMultMax()
+{
+    return duration_mult_max;
+}
+bool TaskScheduler::getEnable()
+{
+    return en;
+}
+
+// setters
+void TaskScheduler::setTresHoldMax(int tm)
+{
+    if (tm >= 0)
     {
+        threshold_max = tm;
     }
+}
 
-    // getters
-    int getTreshold();
-    int getTresholdMax();
-    int getDuraion();
-    int getDurationMax();
-    int getDuraionMult();
-    int getDuraionMultMax();
-    bool getEnable();
+void TaskScheduler::setDurationMax(int dm)
+{
+    if (dm >= 0)
+    {
+        duration_max = dm;
+    }
+}
 
-    // setters
-    void setTresHoldMax(int tm);
-    void setDurationMax(int dm);
-    void setDurationMultMax(int dmm);
-    void setEnable(bool en);
-};
+void TaskScheduler::setDurationMultMax(int dmm)
+{
+    if (dmm >= 0)
+    {
+        threshold_max = dmm;
+    }
+}
