@@ -86,7 +86,7 @@ void LightSource::sense()
                 duration = 0;
                 if (duration_mult < duration_mult_max)
                 {
-                    duration_mult_max++;
+                    duration_mult++;
                 }
                 break;
             }

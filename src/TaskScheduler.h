@@ -10,17 +10,13 @@ private:
     int threshold = 0;
     int threshold_max = 0;
     int duration = 0;
-    int duration_max = 1000;
+    int duration_max = 150;
     int duration_mult = 0;
-    int duration_mult_max = 40;
+    int duration_mult_max = 100;
+    int state = false;
     bool en = true;
 
 public:
-    // constructors
-    /**
-     * default constructor
-     */
-    TaskScheduler();
 
     // methods
     bool trigger(bool s);
@@ -34,6 +30,7 @@ public:
     int getDurationMax();
     int getDuraionMult();
     int getDuraionMultMax();
+    bool getState();
     bool getEnable();
 
     // setters

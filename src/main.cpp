@@ -1,38 +1,76 @@
 
 #include <Arduino.h>
+#include "Adafruit_VL53L0X.h"
 #include "LightSource.h"
-#include "TaskScheduler.h"
 #include "func.h"
+#include "TaskScheduler.h"
+
+
+const unsigned char PIR_CHODBA_WC = 31;
+const unsigned char PIR_CHODBA_MATES = 30;
+const unsigned char PIR_OBYVAK = 32;
+const unsigned char PIR_KUCHYN = 33;
+const unsigned char PIR_KOUPELNA = 8;
+
+const unsigned char FOT_CHODBA = 14;
+const unsigned char FOT_KOUPELNA = 15;
+
+const unsigned char LED_CHODBA_ORI_WC = 4;
+const unsigned char LED_CHODBA_ORI_MATES = 11;
+const unsigned char LED_KOUPELNA_ORI_WC = 5;
+const unsigned char LED_KOUPELNA_ORI_UMYVADLO = 12;
+const unsigned char LED_KOUPELNA_ZRCADLO = 7;
+const unsigned char LED_KOUPELNA_POLICE_BI = 9;
+const unsigned char LED_KOUPELNA_POLICE_ZL = 10;
+
+const unsigned char RELE_ZACHOD = 35;
+
+//Adafruit_VL53L0X lox = Adafruit_VL53L0X();
+
 void setup()
 {
-  // test git 2
-  //  put your setup code here, to run once:
   Serial.begin(9600);
+  Wire.begin();
+  //muxSwitch(4);
 
-  pinMode(14, INPUT); // fotodioda chodba
-  pinMode(31, INPUT); // chodba mates
-  pinMode(30, INPUT); // chodba wc
-  pinMode(22, INPUT); // kuchyn
-  pinMode(32, INPUT); // obývák
-  pinMode(42, INPUT); // koupelna
-                      //  put your setup code here, to run once:
-  pinMode(4, OUTPUT); // led světlo chodba orientační WC
-  digitalWrite(4, LOW);
-  pinMode(5, OUTPUT); // led světlo kooupelna orientační vana +WC
-  digitalWrite(5, LOW);
-  pinMode(6, OUTPUT); // led světlo koupelna orientační umyvadlo +koše
-  digitalWrite(6, LOW);
-  pinMode(7, OUTPUT);
-  digitalWrite(7, LOW); // led světlo zrcadlo koupelna
-  pinMode(8, OUTPUT);
-  digitalWrite(8, LOW); // led svetlo police zluta
-  pinMode(9, OUTPUT);   // led svetlo police bila
-  digitalWrite(9, LOW);
-  pinMode(10, OUTPUT);
-  digitalWrite(10, LOW);
-  pinMode(11, OUTPUT); // led světlo orientační chodba Matěj
-  digitalWrite(11, LOW);
-  // put your setup code here, to run once:
+  /*delay(3000);
+  Serial.println("VL53L0X booting...");
+  if (!lox.begin())
+  {
+    Serial.println(("VL53L0X FAILED"));
+  }
+  else
+  {
+    Serial.println(("VL53L0X OK"));
+  }
+  lox.startRangeContinuous();
+  */
+  pinMode(PIR_CHODBA_WC, INPUT);
+  pinMode(PIR_CHODBA_MATES, INPUT);
+  pinMode(PIR_OBYVAK, INPUT);
+  pinMode(PIR_KUCHYN, INPUT);
+  pinMode(PIR_KOUPELNA, INPUT);
+
+  pinMode(FOT_CHODBA, INPUT);
+  pinMode(FOT_KOUPELNA, INPUT);
+
+  pinMode(LED_CHODBA_ORI_WC, OUTPUT);
+  digitalWrite(LED_CHODBA_ORI_WC, LOW);
+  pinMode(LED_CHODBA_ORI_MATES, OUTPUT);
+  digitalWrite(LED_CHODBA_ORI_MATES, LOW);
+  pinMode(LED_KOUPELNA_ORI_WC, OUTPUT);
+  digitalWrite(LED_KOUPELNA_ORI_WC, LOW);
+  pinMode(LED_KOUPELNA_ORI_UMYVADLO, OUTPUT);
+  digitalWrite(LED_KOUPELNA_ORI_UMYVADLO, LOW);
+  pinMode(LED_KOUPELNA_ZRCADLO, OUTPUT);
+  digitalWrite(LED_KOUPELNA_ZRCADLO, LOW);
+  pinMode(LED_KOUPELNA_POLICE_BI, OUTPUT);
+  digitalWrite(LED_KOUPELNA_POLICE_BI, LOW);
+  pinMode(LED_KOUPELNA_POLICE_ZL, OUTPUT);
+  digitalWrite(LED_KOUPELNA_POLICE_ZL, LOW);
+
+  pinMode(RELE_ZACHOD, OUTPUT);
+  digitalWrite(RELE_ZACHOD, HIGH);
 
   noInterrupts(); // disable all interrupts
                   // set timer4 interrupt at 1Hz
@@ -68,43 +106,52 @@ ISR(TIMER4_COMPA_vect) // timer compare interrupt service routine
 void loop()
 {
   // deklarace promenych
-  chodba.setPinLed(4, 11);
-  chodba.setPinTrig(31);
-  koupelka.setPinLed(5, 12, 8);  // zahrnuje i polici - zluta
-  koupelka.setPinTrig(42);
-  koupelka_police_bila.setPinLed(9);
+  chodba.setPinLed(LED_CHODBA_ORI_MATES, LED_CHODBA_ORI_WC);
+  chodba.setPinTrig(PIR_CHODBA_MATES, PIR_CHODBA_WC);
+  koupelka.setPinLed(LED_KOUPELNA_ORI_UMYVADLO, LED_KOUPELNA_ORI_WC, LED_KOUPELNA_POLICE_BI, LED_KOUPELNA_POLICE_ZL); // zahrnuje i polici - zluta
+  koupelka.setPinTrig(PIR_KOUPELNA);
+  koupelka_police_bila.setPinLed(PIR_KOUPELNA);
   koupelka_police_bila.setBrightnessMax(100);
-
+  zachod_odsavani.setTresHoldMax(100);
+  int c = 0;
   // hlavni smycka
   while (true)
   {
-    delay(50);
 
+    delay(50);
     // nacti data z pir senzorů
     chodba.sense();
     koupelka.sense();
     koupelka_police_bila.sense();
 
     // jestli je svetlo na fotosenzoru => true
-    bool je_svetlo_koupelka = analogRead(15) > 20;
-    bool je_svetlo_chodba = analogRead(15) > 20;
+    bool je_tma_koupelka = analogRead(FOT_KOUPELNA) < 30;
+    bool je_tma_chodba = analogRead(FOT_CHODBA) < 30;
+    je_tma_chodba = true;
+    je_tma_koupelka = true;
 
     // vypni/zapni svetlo
-    koupelka.enable(je_svetlo_koupelka);
-    chodba.enable(je_svetlo_chodba);
-    koupelka_police_bila.enable(je_svetlo_koupelka);
+    koupelka.enable(je_tma_koupelka);
+    chodba.enable(je_tma_chodba);
+    koupelka_police_bila.enable(je_tma_koupelka);
 
-
-    // TODO: implementace knihovny a senzoru vzdalenosti
-    // if (zachod_odsavani.trigger(analogRead(cidlo)))
-    /*
-    if (zachod_odsavani.trigger(analogRead(99))) {
-      digitalWrite(100, 1);
+    /*if (zachod_odsavani.trigger(lox.readRange() < 600))
+    {
+      digitalWrite(RELE_ZACHOD, 0);
     }
-    else {
-      digitalWrite(100, 0);
+    else
+    {
+      digitalWrite(RELE_ZACHOD, 1);
+    }*/
+    if (c == 10)
+    {
+      chodba.debug();
+      Serial.println(digitalRead(PIR_CHODBA_MATES));
+      Serial.println(digitalRead(PIR_CHODBA_WC)); 
+      Serial.println(digitalRead(PIR_KOUPELNA));
+      Serial.println(digitalRead(FOT_CHODBA));
+      c = 0;
     }
-    
-    */
+    c++;
   }
 }

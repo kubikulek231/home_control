@@ -1,5 +1,6 @@
 #include "TaskScheduler.h"
 
+
 bool TaskScheduler::trigger(bool is_triggered)
 {
     if (!en)
@@ -17,24 +18,31 @@ bool TaskScheduler::trigger(bool is_triggered)
             threshold++;
             return false;
         }
+        if (!state) {
+            state = true;
+            return true;
+        }
         duration_mult++;
         duration = 0;
         return true;
     }
     else
     {
-        if ((duration != duration_max + duration_mult * 3) and (threshold == threshold_max))
-        {
-            duration++;
-            return true;
+        if (!state) {
+            threshold = 0;
+            return false;
         }
-        else
+        if ((duration == duration_max + duration_mult*2))
         {
             threshold = 0;
             duration = 0;
             duration_mult = 0;
+            state = false;
             return false;
         }
+        duration++;
+        return true;
+
     }
 }
 
@@ -64,6 +72,10 @@ void TaskScheduler::enable(bool e)
 }
 
 // getters
+bool TaskScheduler::getState()
+{
+    return state;
+}
 int TaskScheduler::getTreshold()
 {
     return threshold;
