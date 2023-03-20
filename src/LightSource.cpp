@@ -3,8 +3,6 @@
 
 LightSource::LightSource()
 {
-    trig_pin_size = 1;
-    led_pin_size = 1;
 }
 
 LightSource::LightSource(unsigned char t, unsigned char p)
@@ -24,7 +22,7 @@ void LightSource::update()
     // if static
     if (state == 0)
     {
-        if (duration == duration_max)
+        if (duration == duration_max + duration_mult)
         {
             duration = 0;
             duration_mult = 0;
@@ -65,6 +63,7 @@ void LightSource::update()
         if (brightness == 0)
         {
             state = 0;
+            duration = 0;
             duration_mult = 0;
             return;
         }
@@ -80,6 +79,7 @@ void LightSource::update()
 // there's a problem with the sense function clearly
 // the lights are just blinking on it -- dunno why,
 // could be also something with the array and memory :(
+// found a cause - interrupts using modifying vars when working with them (:
 void LightSource::sense()
 {
     if (!en)
@@ -104,8 +104,14 @@ void LightSource::sense()
             {
                 duration_mult++;
             }
+            return;
         }
-        return;
+        if (state == 2) {
+            duration = 0;
+            state = 1;
+            return;
+        }
+        
     }
 }
 

@@ -73,14 +73,14 @@ void setup()
 
   // pinMode(RELE_ZACHOD, OUTPUT);
   // digitalWrite(RELE_ZACHOD, HIGH);
-
+  /*
   noInterrupts(); // disable all interrupts
                   // set timer4 interrupt at 1Hz
   TCCR4A = 0;     // set entire TCCR1A register to 0
   TCCR4B = 0;     // same for TCCR1B
   TCNT4 = 0;      // initialize counter value to 0
   // set compare match register for 1hz increments
-  OCR4A = 15624 / 72; // = (16*10^6) / (1*1024) - 1 (must be <65536) //72
+  OCR4A = 15624 / 36; // = (16*10^6) / (1*1024) - 1 (must be <65536) //72
   // turn on CTC mode
   TCCR4B |= (1 << WGM12);
   // Set CS12 and CS10 bits for 1024 prescaler
@@ -88,27 +88,25 @@ void setup()
   // enable timer compare interrupt
   TIMSK4 |= (1 << OCIE4A);
   interrupts(); // enable all interrupts
+  */
 }
 
-LightSource chodba_wc;
-LightSource chodba_str_mat;
-LightSource koupelka;
-LightSource koupelka_police_bila;
-
-TaskScheduler zachod_odsavani;
 
 // main interrupt code
 ISR(TIMER4_COMPA_vect) // timer compare interrupt service routine
 {
-  chodba_str_mat.update();
+  /*chodba_str_mat.update();
   chodba_wc.update();
   koupelka.update();
-  koupelka_police_bila.update();
-  
+  koupelka_police_bila.update();*/
 }
 
 void loop()
 {
+  LightSource chodba_wc;
+  LightSource chodba_str_mat;
+  LightSource koupelka;
+  LightSource koupelka_police_bila;
   // deklarace promenych
   chodba_str_mat.setPinLed(LED_CHODBA_ORI_MATES);
   chodba_str_mat.setPinTrig(PIR_CHODBA_MATES, PIR_CHODBA_STR);
@@ -116,7 +114,9 @@ void loop()
   chodba_wc.setPinTrig(PIR_CHODBA_WC);
   koupelka.setPinLed(LED_KOUPELNA_ORI_UMYVADLO, LED_KOUPELNA_ORI_WC, LED_KOUPELNA_POLICE_ZL); // zahrnuje i polici - zluta
   koupelka.setPinTrig(PIR_KOUPELNA_VST, PIR_KOUPELNA_VAN);
-  zachod_odsavani.setTresHoldMax(100);
+  koupelka_police_bila.setPinLed(koupelka_police_bila);
+  koupelka_police_bila.setPinTrig(PIR_KOUPELNA_VAN, PIR_KOUPELNA_VST);
+  koupelka_police_bila.setBrightnessMax(80);
   int c = 0;
   bool je_tma_koupelka = true;
   bool je_tma_chodba = true;
@@ -124,9 +124,13 @@ void loop()
   while (true)
   {
     delay(10);
-    chodba_str_mat.debug();
-    // nacti data z pir senzorů
-    koupelka_police_bila.sense(); 
+    chodba_str_mat.update();
+    chodba_wc.update();
+    koupelka.update();
+    koupelka_police_bila.update();
+    // chodba_str_mat.debug();
+    //  nacti data z pir senzorů
+    koupelka_police_bila.sense();
     chodba_wc.sense();
     chodba_str_mat.sense();
     koupelka.sense();
@@ -138,33 +142,9 @@ void loop()
     // je_tma_chodba = analogRead(FOT_CHODBA) < 2;
 
     // vypni/zapni svetlo
-    koupelka.enable(je_tma_koupelka);
+    /*koupelka.enable(je_tma_koupelka);
     koupelka_police_bila.enable(je_tma_koupelka);
     chodba_str_mat.enable(je_tma_chodba);
-    chodba_wc.enable(je_tma_chodba);
-
-    if (c == 50)
-    {
-      // koupelka.debug();
-      /*Serial.print("koupelna - vstup ");
-      Serial.println(digitalRead(PIR_KOUPELNA_VST));
-      Serial.print("koupelna - vana ");
-      Serial.println(digitalRead(PIR_KOUPELNA_VAN));
-      Serial.print("kuchyn ");
-      Serial.println(digitalRead(PIR_KUCHYN));
-      Serial.print("chodba wc ");
-      Serial.println(digitalRead(PIR_CHODBA_WC));
-      Serial.print("chodba matej ");
-      Serial.println(digitalRead(PIR_CHODBA_MATES));
-      Serial.print("chodba stred ");
-      Serial.println(digitalRead(PIR_CHODBA_STR));
-      Serial.print("fot chodba ");
-      Serial.println(analogRead(FOT_CHODBA));
-      Serial.print("fot koupelna ");
-      Serial.println(analogRead(FOT_KOUPELNA));
-      */
-      c = 0;
-    }
-    c++;
+    chodba_wc.enable(je_tma_chodba);*/
   }
 }

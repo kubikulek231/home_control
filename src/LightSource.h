@@ -15,9 +15,9 @@ private:
     unsigned char brightness = 0;
     unsigned char brightness_max = 180;
     int duration = 0;
-    int duration_max = 900;
+    int duration_max = 800;
     int duration_mult = 0;
-    int duration_mult_max = 200;
+    int duration_mult_max = 500;
     bool en = true;
 
 public:
@@ -62,6 +62,7 @@ public:
     template <typename... Args>
     void setPinTrig(Args... t)
     {   
+        delete[] trig_pin;
         // get the size of the new array
         trig_pin_size = sizeof...(t);
         // allocate memory for the new array
@@ -82,6 +83,7 @@ public:
     template <typename... Args>
     void setPinLed(Args... l)
     {
+
         // get the size of the new array
         led_pin_size = sizeof...(l);
         // allocate memory for the new array
