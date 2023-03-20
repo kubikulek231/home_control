@@ -3,15 +3,14 @@
 
 LightSource::LightSource()
 {
-    // allocate memory dynamically
-    trig_pin = new unsigned char[1];
-    led_pin = new unsigned char[1];
     trig_pin_size = 1;
     led_pin_size = 1;
 }
 
 LightSource::LightSource(unsigned char t, unsigned char p)
 {
+    // delete[] trig_pin;
+    // delete[] led_pin;
     trig_pin = new unsigned char[1];
     led_pin = new unsigned char[1];
     trig_pin[0] = t;
@@ -21,7 +20,27 @@ LightSource::LightSource(unsigned char t, unsigned char p)
 }
 
 void LightSource::update()
-{
+{   
+    // if static
+    if (state == 0)
+    {
+        if (duration == duration_max)
+        {
+            duration = 0;
+            duration_mult = 0;
+            state = 2;
+            return;
+        }
+        if (brightness == 0)
+        {
+            return;
+        }
+        if (brightness == brightness_max)
+        {
+            duration++;
+            return;
+        }
+    }
     // if rising add +1 brightness
     if (state == 1)
     {
@@ -29,15 +48,14 @@ void LightSource::update()
         if (brightness == brightness_max)
         {
             state = 0;
+            return;
         }
-        else
-        {
-            brightness++;
-        }
+        brightness++;
         for (int i = 0; i < led_pin_size; i++)
         {
             analogWrite(led_pin[i], brightness);
         }
+        return;
     }
 
     // if falling add -1 brightness
@@ -48,49 +66,46 @@ void LightSource::update()
         {
             state = 0;
             duration_mult = 0;
+            return;
         }
-        else
-        {
-            brightness--;
-        }
+        brightness--;
         for (int i = 0; i < led_pin_size; i++)
         {
             analogWrite(led_pin[i], brightness);
         }
-    }
-
-    // if at full brightness and static
-    if (brightness == brightness_max and state == 0)
-    {
-        if (duration == duration_max + duration_mult * 3)
-        {
-            duration = 0;
-            state = 2;
-        }
-        else
-        {
-            duration++;
-        }
+        return;
     }
 }
 
+// there's a problem with the sense function clearly
+// the lights are just blinking on it -- dunno why,
+// could be also something with the array and memory :(
 void LightSource::sense()
 {
-    if (en)
+    if (!en)
     {
-        for (int i = 0; i < trig_pin_size; i++)
+        return;
+    }
+    for (int i = 0; i < trig_pin_size; i++)
+    {
+        if (digitalRead(trig_pin[i]) != 0)
         {
-            if (digitalRead(trig_pin[i]) == 1)
+            continue;
+        }
+        if (state == 0)
+        {
+            if (brightness == 0)
             {
                 state = 1;
-                duration = 0;
-                if (duration_mult < duration_mult_max)
-                {
-                    duration_mult++;
-                }
-                break;
+                return;
+            }
+            duration = 0;
+            if (duration_mult < duration_mult_max)
+            {
+                duration_mult++;
             }
         }
+        return;
     }
 }
 
@@ -101,6 +116,7 @@ void LightSource::enable(bool e)
     {
         state = 2;
         duration = 0;
+        duration_mult = 0;
     }
 }
 
@@ -196,21 +212,23 @@ bool LightSource::getEnable()
 
 void LightSource::setBrightnessMax(unsigned char bm)
 {
-    if (bm >= 0) {
+    if (bm >= 0)
+    {
         brightness_max = bm;
     }
-    
 }
 void LightSource::setDurationMax(int dm)
 {
-    if (dm >= 0) {
-    duration_max = dm;
+    if (dm >= 0)
+    {
+        duration_max = dm;
     }
 }
 
 void LightSource::setDurationMultMax(int dmpm)
 {
-    if (dmpm >= 0) {
-    duration_mult = dmpm;
+    if (dmpm >= 0)
+    {
+        duration_mult = dmpm;
     }
 }

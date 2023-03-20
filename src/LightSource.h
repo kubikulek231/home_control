@@ -7,15 +7,15 @@
 class LightSource
 {
 private:
-    unsigned char *trig_pin = 0;
-    unsigned char *led_pin = 0;
+    unsigned char* trig_pin;
+    unsigned char* led_pin;
     unsigned char trig_pin_size = 1;
     unsigned char led_pin_size = 1;
     unsigned char state = 0;
     unsigned char brightness = 0;
     unsigned char brightness_max = 180;
     int duration = 0;
-    int duration_max = 1000;
+    int duration_max = 900;
     int duration_mult = 0;
     int duration_mult_max = 200;
     bool en = true;
@@ -62,8 +62,6 @@ public:
     template <typename... Args>
     void setPinTrig(Args... t)
     {   
-        // delete dynamically allocated memory
-        delete[] trig_pin;
         // get the size of the new array
         trig_pin_size = sizeof...(t);
         // allocate memory for the new array
@@ -84,8 +82,6 @@ public:
     template <typename... Args>
     void setPinLed(Args... l)
     {
-        // delete dynamically allocated memory
-        delete[] led_pin;
         // get the size of the new array
         led_pin_size = sizeof...(l);
         // allocate memory for the new array
