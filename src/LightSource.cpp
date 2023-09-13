@@ -77,9 +77,8 @@ void LightSource::update()
 }
 
 // there's a problem with the sense function clearly
-// the lights are just blinking on it -- dunno why,
-// could be also something with the array and memory :(
-// found a cause - interrupts using modifying vars when working with them (:
+// the lights are just blinking on it
+// found a cause - interrupts modifying vars when working with them
 void LightSource::sense()
 {
     if (!en)
